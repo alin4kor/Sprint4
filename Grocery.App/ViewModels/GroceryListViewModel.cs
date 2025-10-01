@@ -23,11 +23,11 @@ namespace Grocery.App.ViewModels
             Title = "Boodschappenlijst";
             _groceryListService = groceryListService;
             _clientService = clientService;
-            GroceryLists = new(_groceryListService.GetAll());
             Clients = new(_clientService.GetAll());
 
             var email = Preferences.Get("UserEmail", string.Empty);
             CurrentClient = Clients.FirstOrDefault(c => c.EmailAddress == email);
+            GroceryLists = new(_groceryListService.GetAll().Where(item => item.ClientId == CurrentClient.Id));
         }
 
         [RelayCommand]
@@ -39,7 +39,7 @@ namespace Grocery.App.ViewModels
         public override void OnAppearing()
         {
             base.OnAppearing();
-            GroceryLists = new(_groceryListService.GetAll());
+            GroceryLists = new(_groceryListService.GetAll().Where(item => item.ClientId == CurrentClient.Id));
         }
 
         public override void OnDisappearing()
