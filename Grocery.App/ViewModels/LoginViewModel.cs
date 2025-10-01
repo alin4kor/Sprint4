@@ -34,6 +34,10 @@ namespace Grocery.App.ViewModels
             {
                 LoginMessage = $"Welkom {authenticatedClient.Name}!";
                 _global.Client = authenticatedClient;
+
+                Preferences.Set("UserEmail", authenticatedClient.EmailAddress);
+                Preferences.Set("UserId", authenticatedClient.Id);
+
                 Application.Current.MainPage = new AppShell();
             }
             else
