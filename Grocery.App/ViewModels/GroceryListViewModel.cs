@@ -9,13 +9,25 @@ namespace Grocery.App.ViewModels
     public partial class GroceryListViewModel : BaseViewModel
     {
         public ObservableCollection<GroceryList> GroceryLists { get; set; }
-        private readonly IGroceryListService _groceryListService;
+        public ObservableCollection<Client> Clients { get; set; }
 
-        public GroceryListViewModel(IGroceryListService groceryListService) 
+        [ObservableProperty]
+        private Client currentClient;
+
+
+        private readonly IGroceryListService _groceryListService;
+        private readonly IClientService _clientService;
+
+        public GroceryListViewModel(IGroceryListService groceryListService, IClientService clientService)
         {
             Title = "Boodschappenlijst";
             _groceryListService = groceryListService;
+            _clientService = clientService;
             GroceryLists = new(_groceryListService.GetAll());
+            Clients = new(_clientService.GetAll());
+
+            var email = Preferences.Get("UserEmail", string.Empty);
+            CurrentClient = Clients.FirstOrDefault(c => c.EmailAddress == email);
         }
 
         [RelayCommand]
@@ -34,6 +46,19 @@ namespace Grocery.App.ViewModels
         {
             base.OnDisappearing();
             GroceryLists.Clear();
+        }
+
+        //In GroceryListViewModel maak je de methode ShowBoughtProducts(). Als de Client de rol admin heeft dan navigeer je naar BoughtProductsView. Anders doe je niets.
+        [RelayCommand]
+        public async Task ShowBoughtProducts()
+        {
+            // Assuming you have a way to get the current client's role
+            var email = Preferences.Get("UserEmail", string.Empty);
+            var currentClientRole = _clientService.Get(email);
+            if (currentClientRole?.UserRole == Client.Role.Admin)
+            {
+                await Shell.Current.GoToAsync(nameof(Views.BoughtProductsView));
+            }
         }
     }
 }
