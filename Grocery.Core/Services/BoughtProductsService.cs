@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using Grocery.Core.Interfaces.Repositories;
 using Grocery.Core.Interfaces.Services;
 using Grocery.Core.Models;
@@ -27,8 +28,8 @@ namespace Grocery.Core.Services
             var groceryListItems = _groceryListItemsRepository.GetAll().Where(item => item.ProductId == productId.Value);
             foreach (var item in groceryListItems)
             {
-                var client = _clientRepository.Get(item.Id);
                 var groceryList = _groceryListRepository.Get(item.GroceryListId);
+                var client = _clientRepository.Get(groceryList.ClientId);
                 var product = _productRepository.Get(item.ProductId);
 
                 if (client != null && groceryList != null && product != null)
