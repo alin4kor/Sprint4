@@ -12,6 +12,10 @@
         </Grid>
     </Shell.TitleView>
 
+	<ContentPage.ToolbarItems>
+        <!-- In GroceryListView voeg je een ToolbarItem toe met als binding Client.Name en als Command ShowBoughtProducts-->
+		<ToolbarItem Text="{Binding CurrentClient.Name}" Command="{Binding ShowBoughtProductsCommand}" />
+	</ContentPage.ToolbarItems>
     <Border Stroke="#C49B33"
         StrokeThickness="4"
         Padding="10"
@@ -21,10 +25,9 @@
                         SelectionMode="Single"
                         SelectionChangedCommand="{Binding SelectGroceryListCommand}"
                         SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
-            </CollectionView.ItemsLayout>
-
+			<CollectionView.ItemsLayout>
+				<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+			</CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="m:GroceryList">
                     <Grid>

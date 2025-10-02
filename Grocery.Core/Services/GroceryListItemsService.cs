@@ -1,4 +1,7 @@
-﻿using Grocery.Core.Interfaces.Repositories;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using Grocery.Core.Interfaces.Repositories;
 using Grocery.Core.Interfaces.Services;
 using Grocery.Core.Models;
 
@@ -51,7 +54,30 @@ namespace Grocery.Core.Services
 
         public List<BestSellingProducts> GetBestSellingProducts(int topX = 5)
         {
-            throw new NotImplementedException();
+            List<GroceryListItem> items = GetAll();
+            List < GroceryListItem > combinedItems = new List<GroceryListItem>();
+            foreach (GroceryListItem item in items)
+            {
+                GroceryListItem? existingItem = combinedItems.FirstOrDefault(i => i.ProductId == item.ProductId);
+                if (existingItem != null)
+                {
+                    existingItem.Amount += item.Amount;
+                }
+                else
+                {
+                    combinedItems.Add(new GroceryListItem(0, item.GroceryListId, item.ProductId, item.Amount) { Product = item.Product });
+                }
+            }
+            List<BestSellingProducts> bestSellingProducts = combinedItems
+                .OrderByDescending(i => i.Amount)
+                .Take(topX)
+                .Select(i => new BestSellingProducts(i.Product.Id, i.Product.Name, _productRepository.Get(i.Product.Id)?.Stock ?? 0, i.Amount, 0))
+                .ToList();
+            for (int i = 0; i < bestSellingProducts.Count; i++)
+            {
+                bestSellingProducts[i].Ranking = i + 1;
+            }
+            return bestSellingProducts;
         }
 
         private void FillService(List<GroceryListItem> groceryListItems)
